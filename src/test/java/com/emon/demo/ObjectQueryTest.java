@@ -8,8 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Example;
+import org.springframework.data.jpa.domain.Specification;
 
+import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -62,4 +65,25 @@ public class ObjectQueryTest {
         System.out.println("customer = " + customer);
         // linmans.forEach(s -> System.out.println("s = " + s));
     }
+
+    /**
+     * Specification的多表查询
+     */
+    @Test
+    public void testFind() {
+        Specification<LinkMan> spec = new Specification<LinkMan>() {
+            public Predicate toPredicate(Root<LinkMan> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                //Join代表链接查询，通过root对象获取
+                //创建的过程中，第一个参数为关联对象的属性名称，第二个参数为连接查询的方式（left，inner，right）
+                //JoinType.LEFT : 左外连接,JoinType.INNER：内连接,JoinType.RIGHT：右外连接
+                Join<LinkMan, Customer> join = root.join("customer", JoinType.INNER);
+                return cb.like(join.get("custName").as(String.class),"唐三");
+            }
+        };
+        List<LinkMan> list = linkManDao.findAll(spec);
+        for (LinkMan linkMan : list) {
+            System.out.println(linkMan);
+        }
+    }
+
 }

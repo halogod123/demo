@@ -1,7 +1,5 @@
 package com.emon.demo.entity;
 
-import lombok.Data;
-
 import javax.persistence.*;
 
 @Entity
@@ -27,7 +25,7 @@ public class LinkMan {
     @Column(name="lkm_memo ")
     private String lkmMemo;
 
-    @ManyToOne(targetEntity = Customer.class,fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Customer.class,fetch = FetchType.EAGER)
     @JoinColumn(name="lkm_cust_id",referencedColumnName = "cust_id")
     private Customer customer;
 
